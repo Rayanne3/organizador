@@ -1,0 +1,1 @@
+@powershell -ExecutionPolicy Bypass -File "%~dp0script_gerador.ps1"

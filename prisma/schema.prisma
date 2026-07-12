@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  sku         String   @unique
+  price       Float
+  category    String   // Nova coluna para categorias
+  imageUrl    String?  // Nova coluna para upload de imagem
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  priceHistory PriceHistory[]
+
+  @@map("products")
+}
+
+model PriceHistory {
+  id        String   @id @default(uuid())
+  productId String
+  price     Float
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("price_histories")
+}
