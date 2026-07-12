@@ -11,6 +11,7 @@ import { CategoryManager } from '@/modules/categories/components/CategoryManager
 import { Product } from '@/core/entities/product.entity';
 import { ProductInput } from '@/shared/product.schema';
 import Link from 'next/link';
+import { ProductDetailModal } from '@/modules/products/components/ProductDetailModal';
 
 export default function MenuPage() {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function MenuPage() {
   const [userRole, setUserRole] = useState<'ADMIN' | 'GUEST'>('GUEST');
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [isDeletingProduct, setIsDeletingProduct] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -230,6 +232,7 @@ export default function MenuPage() {
             onEdit={handleEdit}
             onDelete={(id) => setPendingDeleteId(id)}
             onAdjustStock={adjustStock}
+            onSelect={setSelectedProduct}
             isAdmin={isAdmin}
           />
         )}
@@ -266,6 +269,12 @@ export default function MenuPage() {
           </div>
         </div>
       )}
+      <ProductDetailModal
+        product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+        isAdmin={isAdmin}
+        onEdit={handleEdit}
+      />
     </main>
   );
 }

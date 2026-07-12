@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ProductTableProps } from './ProductTable.types';
 
-export const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, onDelete, onAdjustStock, isAdmin = false }) => {
+export const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, onDelete, onAdjustStock,onSelect, isAdmin = false }) => {
   // Guarda os valores ainda não confirmados, por id do produto
   const [draftStocks, setDraftStocks] = useState<Record<string, number>>({});
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -64,6 +64,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, on
         return (
           <div
             key={product.id}
+            onClick={() => onSelect?.(product)}
             className="group relative flex flex-col bg-white rounded-[var(--radius-lg)] border border-[var(--color-border)] overflow-hidden shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-elevated)] transition-shadow duration-300"
           >
             <div className="relative aspect-[4/3] w-full bg-[var(--color-cream-100)] overflow-hidden">
@@ -138,7 +139,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, on
                           </svg>
                         </button>
                         <button
-                          onClick={() => changeDraft(product, -1)}
+                          onClick={(e) => { e.stopPropagation(); changeDraft(product, -1); }}
                           disabled={displayStock === 0 || isSaving}
                           className="w-7 h-7 flex items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-ink-700)] hover:bg-[var(--color-cream-100)] active:scale-90 transition-all disabled:opacity-30"
                           aria-label="Diminuir"
@@ -149,7 +150,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, on
                           {displayStock}
                         </span>
                         <button
-                          onClick={() => changeDraft(product, 1)}
+                          onClick={(e) => { e.stopPropagation(); changeDraft(product, 1); }}
                           disabled={isSaving}
                           className="w-7 h-7 flex items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-ink-700)] hover:bg-[var(--color-cream-100)] active:scale-90 transition-all"
                           aria-label="Aumentar"
@@ -157,7 +158,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, on
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" strokeLinecap="round" /></svg>
                         </button>
                         <button
-                          onClick={() => confirmChange(product)}
+                          onClick={(e) => { e.stopPropagation(); confirmChange(product); }}
                           disabled={isSaving}
                           className="w-7 h-7 flex items-center justify-center rounded-full bg-[var(--color-success)] text-white hover:opacity-90 active:scale-90 transition-all disabled:opacity-50"
                           aria-label="Confirmar alteração"
@@ -172,7 +173,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, on
                     ) : (
                       <>
                         <button
-                          onClick={() => changeDraft(product, -1)}
+                          onClick={(e) => { e.stopPropagation(); changeDraft(product, -1); }}
                           disabled={product.stock === 0}
                           className="w-7 h-7 flex items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-ink-700)] hover:bg-[var(--color-cream-100)] active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                           aria-label="Diminuir estoque"
@@ -183,7 +184,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, on
                           {product.stock}
                         </span>
                         <button
-                          onClick={() => changeDraft(product, 1)}
+                          onClick={(e) => { e.stopPropagation(); changeDraft(product, 1); }}
                           className="w-7 h-7 flex items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-ink-700)] hover:bg-[var(--color-cream-100)] active:scale-90 transition-all"
                           aria-label="Aumentar estoque"
                         >
@@ -199,14 +200,14 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, on
             {isAdmin && (
               <div className="flex border-t border-[var(--color-border)]">
                 <button
-                  onClick={() => onEdit(product)}
+                  onClick={(e) => { e.stopPropagation(); onEdit(product); }}
                   className="flex-1 py-3 text-xs font-bold uppercase tracking-wide text-[var(--color-ink-700)] hover:bg-[var(--color-cream-100)] transition-colors"
                 >
                   Editar
                 </button>
                 <div className="w-px bg-[var(--color-border)]" />
                 <button
-                  onClick={() => onDelete(product.id)}
+                  onClick={(e) => { e.stopPropagation(); onDelete(product.id); }}
                   className="flex-1 py-3 text-xs font-bold uppercase tracking-wide text-[var(--color-danger)] hover:bg-[var(--color-danger-bg)] transition-colors"
                 >
                   Excluir
