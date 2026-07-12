@@ -62,7 +62,7 @@ async function main() {
       data: product
     });
   }
-
+//ggg
   console.log('Banco de dados populado com sucesso!');
 }
 
