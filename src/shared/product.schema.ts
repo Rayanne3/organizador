@@ -8,18 +8,16 @@ export const PRODUCT_CATEGORIES = [
   "Papelaria",
   "Beleza",
   "Outros"
-] as const;
+] as [string, ...string[]]; // Tipagem explícita para evitar erro de enum
 
 export const productSchema = z.object({
-  name: z.string().min(3, "O nome deve ter no mínimo 3 caracteres"),
+  name: z.string().min(3, "Nome muito curto"),
   description: z.string().optional().nullable(),
-  sku: z.string().min(3, "O SKU deve ter no mínimo 3 caracteres"),
-  // Definição mais simples possível para o número
-  price: z.number().min(0.01, "O preço deve ser maior que zero"),
-  category: z.enum(PRODUCT_CATEGORIES, {
-    errorMap: () => ({ message: "Selecione uma categoria válida" }),
-  }),
-  imageUrl: z.string().url("URL da imagem inválida").optional().or(z.literal("")),
+  sku: z.string().min(3, "SKU muito curto"),
+  price: z.number().min(0.01),
+  // Removi o objeto { errorMap: ... } que estava dando erro no build
+  category: z.enum(PRODUCT_CATEGORIES), 
+  imageUrl: z.string().optional().nullable(),
 });
 
 export const updateProductSchema = productSchema.partial().extend({
