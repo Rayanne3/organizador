@@ -1,9 +1,25 @@
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
+
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('Limpando banco de dados...');
+  await prisma.priceHistory.deleteMany();
   await prisma.product.deleteMany();
+  await prisma.user.deleteMany();
+
+  console.log('Criando usuário administrador...');
+  const hashedPassword = await bcrypt.hash('admin123', 10);
+  
+  await prisma.user.create({
+    data: {
+      name: 'Administrador ODS',
+      email: 'admin@ods.com',
+      password: hashedPassword,
+      role: 'ADMIN',
+    },
+  });
 
   const products = [
     {
@@ -29,41 +45,23 @@ async function main() {
       category: 'Alimentos',
       description: 'Café torrado em grãos, notas de chocolate e caramelo.',
       imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&h=400&fit=crop',
-    },
-    {
-      name: 'Mesa Escrivaninha Industrial',
-      sku: 'CASA-200',
-      price: 480.00,
-      category: 'Casa',
-      description: 'Mesa de madeira com pés em ferro preto.',
-      imageUrl: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=400&h=400&fit=crop',
-    },
-    {
-      name: 'Caderno Moleskine G',
-      sku: 'PAP-009',
-      price: 110.00,
-      category: 'Papelaria',
-      description: 'Caderno pautado com capa dura preta.',
-      imageUrl: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=400&h=400&fit=crop',
-    },
-    {
-      name: 'Perfume Noir Extreme',
-      sku: 'BEA-12',
-      price: 650.00,
-      category: 'Beleza',
-      description: 'Fragrância intensa para ocasiões especiais.',
-      imageUrl: 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&h=400&fit=crop',
     }
   ];
 
   console.log('Populando produtos...');
   for (const product of products) {
     await prisma.product.create({
-      data: product
+      data: {
+        ...product,
+        status: 'ACTIVE'
+      }
     });
   }
-//ggg
-  console.log('Banco de dados populado com sucesso!');
+
+  console.log('---');
+  console.log('Banco de dados populado!');
+  console.log('LOGIN ADMIN: admin@ods.com');
+  console.log('SENHA ADMIN: admin123');
 }
 
 main()

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ProductTableProps } from './ProductTable.types';
 
-export const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, onDelete }) => {
+export const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, onDelete, isAdmin = false }) => {
   return (
     <div className="overflow-x-auto w-full border border-gray-300 rounded-xl shadow-md">
       <table className="min-w-full divide-y divide-gray-300">
@@ -12,7 +12,8 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, on
             <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">SKU</th>
             <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Preço</th>
             <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
-            <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Ações</th>
+            {/* Coluna de ações só aparece se for Admin */}
+            {isAdmin && <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Ações</th>}
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -48,25 +49,29 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, on
                   {product.status === 'ACTIVE' ? 'ATIVO' : 'INATIVO'}
                 </span>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold">
-                <button 
-                  onClick={() => onEdit(product)}
-                  className="text-blue-700 hover:text-blue-900 mr-6 transition-colors"
-                >
-                  EDITAR
-                </button>
-                <button 
-                  onClick={() => onDelete(product.id)}
-                  className="text-red-600 hover:text-red-900 transition-colors"
-                >
-                  EXCLUIR
-                </button>
-              </td>
+              
+              {/* Célula de ações só aparece se for Admin */}
+              {isAdmin && (
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold">
+                  <button 
+                    onClick={() => onEdit(product)}
+                    className="text-blue-700 hover:text-blue-900 mr-6 transition-colors"
+                  >
+                    EDITAR
+                  </button>
+                  <button 
+                    onClick={() => onDelete(product.id)}
+                    className="text-red-600 hover:text-red-900 transition-colors"
+                  >
+                    EXCLUIR
+                  </button>
+                </td>
+              )}
             </tr>
           ))}
           {products.length === 0 && (
             <tr>
-              <td colSpan={6} className="px-6 py-12 text-center text-sm font-bold text-gray-500 uppercase">
+              <td colSpan={isAdmin ? 6 : 5} className="px-6 py-12 text-center text-sm font-bold text-gray-500 uppercase">
                 Nenhum produto encontrado.
               </td>
             </tr>
