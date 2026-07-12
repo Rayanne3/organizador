@@ -5,5 +5,6 @@ export interface ProductFormProps {
   initialData?: Product | null;
   onSubmit: (data: ProductInput) => Promise<void>;
   onCancel: () => void;
+  onManageCategories: () => void;
   isLoading?: boolean;
 }

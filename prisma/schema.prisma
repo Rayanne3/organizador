@@ -7,45 +7,66 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
+enum Role {
   ADMIN
   GUEST
 }
 
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
 model User {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   name      String
   email     String   @unique
   password  String
-  role      UserRole @default(GUEST)
+  role      Role     @default(GUEST)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("users")
 }
 
-model Product {
-  id            String         @id @default(uuid())
-  name          String
-  description   String?
-  sku           String         @unique
-  price         Decimal
-  category      String
-  imageUrl      String?
-  status        String         @default("ACTIVE")
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  priceHistories PriceHistory[]
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  color     String?   // cor de destaque escolhida pelo usuário (hex), opcional
+  order     Int       @default(0) // ordem de exibição no cardápio
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
+  @@map("categories")
+}
+
+model Product {
+  id           String         @id @default(cuid())
+  name         String
+  description  String?
+  sku          String         @unique
+  price        Decimal        @db.Decimal(10, 2)
+  image        String?        @db.Text // imagem em base64 (data URL), enviada do dispositivo
+  status       Status         @default(ACTIVE)
+  categoryId   String
+  category     Category       @relation(fields: [categoryId], references: [id])
+  priceHistory PriceHistory[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([categoryId])
   @@map("products")
 }
 
 model PriceHistory {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   productId String
-  price     Decimal
-  createdAt DateTime @default(now())
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  oldPrice  Decimal  @db.Decimal(10, 2)
+  newPrice  Decimal  @db.Decimal(10, 2)
+  changedAt DateTime @default(now())
 
-  @@map("price_histories")
+  @@map("price_history")
 }

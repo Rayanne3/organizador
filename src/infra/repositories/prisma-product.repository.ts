@@ -3,7 +3,6 @@ import { Product, CreateProductDTO, UpdateProductDTO } from "../../core/entities
 import { IProductRepository, ProductFilters } from "../../core/interfaces/product-repository.interface";
 
 export class PrismaProductRepository implements IProductRepository {
-  // Função auxiliar para garantir que o objeto de retorno combine com a Interface
   private mapProduct(p: any): Product {
     return {
       id: p.id,
@@ -11,9 +10,15 @@ export class PrismaProductRepository implements IProductRepository {
       description: p.description ?? null,
       sku: p.sku,
       price: Number(p.price),
-      category: p.category,
-      imageUrl: p.imageUrl ?? null,
+      image: p.image ?? null,
       status: p.status as "ACTIVE" | "INACTIVE",
+      categoryId: p.categoryId,
+      category: {
+        id: p.category.id,
+        name: p.category.name,
+        slug: p.category.slug,
+        color: p.category.color ?? null,
+      },
       createdAt: p.createdAt,
       updatedAt: p.updatedAt,
     };
@@ -26,44 +31,46 @@ export class PrismaProductRepository implements IProductRepository {
         description: data.description,
         sku: data.sku,
         price: data.price,
-        category: data.category,
-        imageUrl: data.imageUrl,
+        image: data.image,
+        categoryId: data.categoryId,
         status: 'ACTIVE',
-      }
+      },
+      include: { category: true },
     });
     return this.mapProduct(p);
   }
 
   async findById(id: string): Promise<Product | null> {
-    const p = await prisma.product.findUnique({ where: { id } });
+    const p = await prisma.product.findUnique({ where: { id }, include: { category: true } });
     return p ? this.mapProduct(p) : null;
   }
 
   async findBySku(sku: string): Promise<Product | null> {
-    const p = await prisma.product.findUnique({ where: { sku } });
+    const p = await prisma.product.findUnique({ where: { sku }, include: { category: true } });
     return p ? this.mapProduct(p) : null;
   }
 
   async findAll(filters?: ProductFilters): Promise<Product[]> {
     const where: any = {};
 
-    if (filters?.category && filters.category !== "") {
-      where.category = filters.category;
+    if (filters?.categoryId && filters.categoryId !== "") {
+      where.categoryId = filters.categoryId;
     }
 
     if (filters?.search && filters.search !== "") {
       where.OR = [
-        { name: { contains: filters.search } },
-        { sku: { contains: filters.search } },
+        { name: { contains: filters.search, mode: "insensitive" } },
+        { sku: { contains: filters.search, mode: "insensitive" } },
       ];
     }
 
     const products = await prisma.product.findMany({
       where,
-      orderBy: { createdAt: 'desc' }
+      include: { category: true },
+      orderBy: { createdAt: 'desc' },
     });
 
-    return products.map(p => this.mapProduct(p));
+    return products.map((p) => this.mapProduct(p));
   }
 
   async update(id: string, data: UpdateProductDTO): Promise<Product> {
@@ -74,10 +81,11 @@ export class PrismaProductRepository implements IProductRepository {
         description: data.description,
         sku: data.sku,
         price: data.price,
-        category: data.category,
-        imageUrl: data.imageUrl,
+        image: data.image,
+        categoryId: data.categoryId,
         status: data.status,
-      }
+      },
+      include: { category: true },
     });
     return this.mapProduct(p);
   }

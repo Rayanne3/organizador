@@ -2,82 +2,94 @@ import React from 'react';
 import { ProductTableProps } from './ProductTable.types';
 
 export const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, onDelete, isAdmin = false }) => {
+  if (products.length === 0) {
+    return (
+      <div className="py-24 text-center">
+        <p className="font-display text-xl text-[var(--color-ink-500)]">Nenhum item encontrado</p>
+        <p className="text-sm text-[var(--color-ink-300)] mt-1">
+          Ajuste os filtros ou adicione um novo item.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="overflow-x-auto w-full border border-gray-300 rounded-xl shadow-md">
-      <table className="min-w-full divide-y divide-gray-300">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Produto</th>
-            <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Categoria</th>
-            <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">SKU</th>
-            <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Preço</th>
-            <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
-            {/* Coluna de ações só aparece se for Admin */}
-            {isAdmin && <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Ações</th>}
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {products.map((product) => (
-            <tr key={product.id} className="hover:bg-blue-50 transition-colors">
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center">
-                  <div className="h-12 w-12 flex-shrink-0 bg-gray-100 border border-gray-200 rounded-md overflow-hidden">
-                    {product.imageUrl ? (
-                      <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center text-[10px] text-gray-400 font-bold uppercase p-1 text-center">
-                        Sem Foto
-                      </div>
-                    )}
-                  </div>
-                  <div className="ml-4">
-                    <div className="text-sm font-bold text-gray-900">{product.name}</div>
-                  </div>
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700">
-                <span className="bg-gray-200 px-3 py-1 rounded-md">
-                  {product.category || 'Outros'}
-                </span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">{product.sku}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
+    <div className="grid gap-5 grid-cols-[repeat(auto-fill,minmax(240px,1fr))]">
+      {products.map((product) => (
+        <div
+          key={product.id}
+          className="group relative flex flex-col bg-white rounded-[var(--radius-lg)] border border-[var(--color-border)] overflow-hidden shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-elevated)] transition-shadow duration-300"
+        >
+          {/* Imagem */}
+          <div className="relative aspect-[4/3] w-full bg-[var(--color-cream-100)] overflow-hidden">
+            {product.image ? (
+              <img
+                src={product.image}
+                alt={product.name}
+                className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-cream-300)" strokeWidth="1.5">
+                  <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            )}
+
+            {/* Badge de categoria */}
+            <span
+              className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide text-white shadow"
+              style={{ backgroundColor: product.category.color || 'var(--color-gold-500)' }}
+            >
+              {product.category.name}
+            </span>
+
+            {/* Status */}
+            {product.status === 'INACTIVE' && (
+              <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide bg-white/90 text-[var(--color-danger)]">
+                Inativo
+              </span>
+            )}
+          </div>
+
+          {/* Conteúdo */}
+          <div className="flex-1 flex flex-col p-4 gap-1.5">
+            <h3 className="font-display text-base text-[var(--color-ink-900)] leading-snug">
+              {product.name}
+            </h3>
+            {product.description && (
+              <p className="text-xs text-[var(--color-ink-500)] line-clamp-2 leading-relaxed">
+                {product.description}
+              </p>
+            )}
+            <div className="flex items-center justify-between mt-auto pt-3">
+              <span className="font-display text-lg text-[var(--color-gold-600)]">
                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                <span className={`px-2.5 py-1 rounded-full text-xs font-black tracking-wide ${product.status === 'ACTIVE' ? 'bg-green-200 text-green-900' : 'bg-red-200 text-red-900'}`}>
-                  {product.status === 'ACTIVE' ? 'ATIVO' : 'INATIVO'}
-                </span>
-              </td>
-              
-              {/* Célula de ações só aparece se for Admin */}
-              {isAdmin && (
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold">
-                  <button 
-                    onClick={() => onEdit(product)}
-                    className="text-blue-700 hover:text-blue-900 mr-6 transition-colors"
-                  >
-                    EDITAR
-                  </button>
-                  <button 
-                    onClick={() => onDelete(product.id)}
-                    className="text-red-600 hover:text-red-900 transition-colors"
-                  >
-                    EXCLUIR
-                  </button>
-                </td>
-              )}
-            </tr>
-          ))}
-          {products.length === 0 && (
-            <tr>
-              <td colSpan={isAdmin ? 6 : 5} className="px-6 py-12 text-center text-sm font-bold text-gray-500 uppercase">
-                Nenhum produto encontrado.
-              </td>
-            </tr>
+              </span>
+              <span className="text-[10px] font-mono text-[var(--color-ink-300)]">{product.sku}</span>
+            </div>
+          </div>
+
+          {/* Ações (admin) */}
+          {isAdmin && (
+            <div className="flex border-t border-[var(--color-border)]">
+              <button
+                onClick={() => onEdit(product)}
+                className="flex-1 py-3 text-xs font-bold uppercase tracking-wide text-[var(--color-ink-700)] hover:bg-[var(--color-cream-100)] transition-colors"
+              >
+                Editar
+              </button>
+              <div className="w-px bg-[var(--color-border)]" />
+              <button
+                onClick={() => onDelete(product.id)}
+                className="flex-1 py-3 text-xs font-bold uppercase tracking-wide text-[var(--color-danger)] hover:bg-[var(--color-danger-bg)] transition-colors"
+              >
+                Excluir
+              </button>
+            </div>
           )}
-        </tbody>
-      </table>
+        </div>
+      ))}
     </div>
   );
 };

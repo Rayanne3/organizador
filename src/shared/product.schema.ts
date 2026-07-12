@@ -1,23 +1,20 @@
 import { z } from "zod";
 
-export const PRODUCT_CATEGORIES = [
-  "Eletrônicos",
-  "Vestuário",
-  "Alimentos",
-  "Casa",
-  "Papelaria",
-  "Beleza",
-  "Outros"
-] as [string, ...string[]]; // Tipagem explícita para evitar erro de enum
+// ~5MB de imagem original vira ~6.7MB em base64 — limite generoso pra tablet/celular
+const MAX_IMAGE_BASE64_LENGTH = 7_000_000;
 
 export const productSchema = z.object({
   name: z.string().min(3, "Nome muito curto"),
   description: z.string().optional().nullable(),
   sku: z.string().min(3, "SKU muito curto"),
-  price: z.number().min(0.01),
-  // Removi o objeto { errorMap: ... } que estava dando erro no build
-  category: z.enum(PRODUCT_CATEGORIES), 
-  imageUrl: z.string().optional().nullable(),
+  price: z.number().min(0.01, "Preço deve ser maior que zero"),
+  categoryId: z.string().min(1, "Selecione uma categoria"),
+  image: z
+    .string()
+    .refine((val) => !val || val.startsWith("data:image/"), "Imagem inválida")
+    .refine((val) => !val || val.length <= MAX_IMAGE_BASE64_LENGTH, "Imagem muito grande (máx. ~5MB)")
+    .optional()
+    .nullable(),
 });
 
 export const updateProductSchema = productSchema.partial().extend({

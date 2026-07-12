@@ -9,15 +9,14 @@ export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  // Estados para Filtros
+
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
+  const [categoryId, setCategoryId] = useState('');
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await ProductService.getAll({ search, category });
+      const data = await ProductService.getAll({ search, categoryId });
       setProducts(data);
       setError(null);
     } catch (err: any) {
@@ -25,11 +24,9 @@ export const useProducts = () => {
     } finally {
       setLoading(false);
     }
-  }, [search, category]); // Recarrega quando os filtros mudam
+  }, [search, categoryId]);
 
   useEffect(() => {
-    // Implementação básica: busca imediata ao digitar
-    // Em produção, aqui poderia haver um 'debounce'
     fetchProducts();
   }, [fetchProducts]);
 
@@ -58,13 +55,12 @@ export const useProducts = () => {
   };
 
   const removeProduct = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este produto?')) return;
     setLoading(true);
     try {
       await ProductService.delete(id);
       await fetchProducts();
     } catch (err: any) {
-      alert(err.message);
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -76,8 +72,8 @@ export const useProducts = () => {
     error,
     search,
     setSearch,
-    category,
-    setCategory,
+    categoryId,
+    setCategoryId,
     addProduct,
     editProduct,
     removeProduct,

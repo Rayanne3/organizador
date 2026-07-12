@@ -1,37 +1,44 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProducts } from '@/modules/products/hooks/useProducts';
+import { useCategories } from '@/modules/categories/hooks/useCategories';
 import { ProductTable } from '@/modules/products/components/ProductTable';
 import { ProductForm } from '@/modules/products/components/ProductForm';
+import { CategoryManager } from '@/modules/categories/components/CategoryManager';
 import { Product } from '@/core/entities/product.entity';
-import { ProductInput, PRODUCT_CATEGORIES } from '@/shared/product.schema';
+import { ProductInput } from '@/shared/product.schema';
 import Link from 'next/link';
 
-export default function ProductOrganizerPage() {
+export default function MenuPage() {
   const router = useRouter();
-  const { 
-    products, 
-    loading, 
-    search, 
-    setSearch, 
-    category, 
-    setCategory, 
-    addProduct, 
-    editProduct, 
-    removeProduct 
+  const {
+    products,
+    loading,
+    search,
+    setSearch,
+    categoryId,
+    setCategoryId,
+    addProduct,
+    editProduct,
+    removeProduct,
   } = useProducts();
+
+  const { categories } = useCategories();
 
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
   const [userRole, setUserRole] = useState<'ADMIN' | 'GUEST'>('GUEST');
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [isDeletingProduct, setIsDeletingProduct] = useState(false);
 
-  // Checar sessão ao carregar a página
   useEffect(() => {
     fetch('/api/auth/me')
-      .then(res => res.json())
-      .then(data => setUserRole(data.role || 'GUEST'));
+      .then((res) => res.json())
+      .then((data) => setUserRole(data.role || 'GUEST'));
   }, []);
 
   const handleLogout = async () => {
@@ -62,114 +69,201 @@ export default function ProductOrganizerPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleConfirmDelete = async () => {
+    if (!pendingDeleteId || isDeletingProduct) return;
+    setIsDeletingProduct(true);
+    try {
+      await removeProduct(pendingDeleteId);
+      setPendingDeleteId(null);
+    } catch (error: any) {
+      alert(error.message);
+    } finally {
+      setIsDeletingProduct(false);
+    }
+  };
+
   const isAdmin = userRole === 'ADMIN';
 
   return (
-    <main className="min-h-screen bg-gray-100 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Cabeçalho */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 bg-white p-8 rounded-xl border border-gray-300 shadow-sm">
+    <main className="min-h-screen bg-[var(--color-cream-50)]">
+      {/* Cabeçalho fixo */}
+      <header className="sticky top-0 z-30 bg-[var(--color-cream-50)]/90 backdrop-blur-md border-b border-[var(--color-border)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-5 flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tighter">ORGANIZADOR ODS</h1>
-            <div className="flex items-center gap-2 mt-2">
-              <span className={`text-xs font-bold px-2 py-0.5 rounded ${isAdmin ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
-                {isAdmin ? 'MODO ADMINISTRADOR' : 'MODO CONVIDADO'}
+            <h1 className="font-display text-2xl sm:text-3xl text-[var(--color-ink-900)]">PRODUTOS</h1>
+            {isAdmin && (
+              <span className="inline-block mt-1 text-[10px] font-bold uppercase tracking-wide text-[var(--color-gold-600)] bg-[var(--color-gold-100)] px-2 py-0.5 rounded-full">
+                Modo administrador
               </span>
-            </div>
+            )}
           </div>
-          
-          <div className="flex gap-3">
+
+          <div className="flex items-center gap-2 sm:gap-3">
             {isAdmin ? (
               <>
+                <button
+                  onClick={() => setIsCategoryManagerOpen(true)}
+                  className="hidden sm:inline-flex px-4 py-2.5 rounded-[var(--radius-md)] border border-[var(--color-border)] text-sm font-semibold text-[var(--color-ink-700)] hover:bg-white transition-colors"
+                >
+                  Categorias
+                </button>
                 {!isFormOpen && (
                   <button
                     onClick={() => setIsFormOpen(true)}
-                    className="bg-blue-700 hover:bg-blue-800 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition-all active:scale-95"
+                    className="px-4 sm:px-5 py-2.5 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] text-[var(--color-cream-50)] text-sm font-semibold hover:bg-[var(--color-ink-700)] active:scale-95 transition-all whitespace-nowrap"
                   >
-                    + NOVO PRODUTO
+                    + Novo item
                   </button>
                 )}
                 <button
                   onClick={handleLogout}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-6 py-3 rounded-xl transition-all"
+                  className="px-4 py-2.5 rounded-[var(--radius-md)] text-sm font-semibold text-[var(--color-ink-500)] hover:bg-[var(--color-cream-200)] transition-colors"
                 >
-                  SAIR
+                  Sair
                 </button>
               </>
             ) : (
               <Link
                 href="/login"
-                className="bg-gray-900 hover:bg-black text-white font-bold px-8 py-3 rounded-xl shadow-lg transition-all text-center"
+                className="px-5 py-2.5 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] text-[var(--color-cream-50)] text-sm font-semibold hover:bg-[var(--color-ink-700)] transition-colors"
               >
-                LOGIN ADMIN
+                Login
               </Link>
             )}
           </div>
-        </header>
-
-        <div className="space-y-8">
-          {/* Seção do Formulário (Apenas Admin) */}
-          {isFormOpen && isAdmin && (
-            <section className="animate-in slide-in-from-top-4 duration-300">
-              <ProductForm 
-                initialData={editingProduct} 
-                onSubmit={handleSubmit} 
-                onCancel={() => { setIsFormOpen(false); setEditingProduct(null); }}
-                isLoading={loading}
-              />
-            </section>
-          )}
-
-          {/* Filtros */}
-          <section className="bg-white p-6 rounded-xl border border-gray-300 shadow-sm flex flex-col md:flex-row gap-4 items-end">
-            <div className="flex-1 w-full flex flex-col gap-1.5">
-              <label className="text-xs font-black text-gray-700 uppercase">Pesquisar</label>
-              <input
-                type="text"
-                placeholder="Nome ou SKU do produto..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full border-2 border-gray-400 rounded-lg px-4 py-2.5 text-gray-900 font-medium focus:ring-2 focus:ring-blue-600 outline-none transition-all"
-              />
-            </div>
-
-            <div className="w-full md:w-64 flex flex-col gap-1.5">
-              <label className="text-xs font-black text-gray-700 uppercase">Filtrar por Categoria</label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full border-2 border-gray-400 rounded-lg px-4 py-2.5 text-gray-900 font-bold bg-white focus:ring-2 focus:ring-blue-600 outline-none"
-              >
-                <option value="">TODAS AS CATEGORIAS</option>
-                {PRODUCT_CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>{cat.toUpperCase()}</option>
-                ))}
-              </select>
-            </div>
-          </section>
-
-          {/* Listagem (Passando o papel do usuário) */}
-          <section className="bg-white rounded-xl border border-gray-300 shadow-md overflow-hidden">
-            <div className="p-5 border-b bg-gray-50">
-              <h2 className="text-xl font-bold text-gray-900">📦 Inventário</h2>
-            </div>
-            
-            {loading && products.length === 0 ? (
-              <div className="p-20 text-center font-bold text-gray-500 text-lg">
-                <div className="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4"></div>
-                <br />Sincronizando...
-              </div>
-            ) : (
-              <ProductTable 
-                products={products} 
-                onEdit={handleEdit} 
-                onDelete={removeProduct}
-                isAdmin={isAdmin} // Nova Prop que vamos adicionar no próximo passo
-              />
-            )}
-          </section>
         </div>
+
+        {/* Busca */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 pb-4">
+          <div className="relative">
+            <svg
+              className="absolute left-4 top-1/2 -translate-y-1/2" width="16" height="16"
+              viewBox="0 0 24 24" fill="none" stroke="var(--color-ink-300)" strokeWidth="2"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" strokeLinecap="round" />
+            </svg>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar item ou código..."
+              className="w-full pl-11 pr-4 py-3 rounded-full border border-[var(--color-border)] bg-white text-sm font-medium text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-300)] focus:outline-none focus:ring-2 focus:ring-[var(--color-gold-400)] transition-all"
+            />
+          </div>
+        </div>
+
+        {/* Chips de categoria */}
+        {categories.length > 0 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 pb-4 flex gap-2 overflow-x-auto no-select" style={{ scrollbarWidth: 'none' }}>
+            <button
+              onClick={() => setCategoryId('')}
+              className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide transition-all ${
+                categoryId === ''
+                  ? 'bg-[var(--color-ink-900)] text-[var(--color-cream-50)]'
+                  : 'bg-white border border-[var(--color-border)] text-[var(--color-ink-700)] hover:border-[var(--color-gold-400)]'
+              }`}
+            >
+              Todos
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setCategoryId(cat.id)}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide transition-all ${
+                  categoryId === cat.id
+                    ? 'text-white'
+                    : 'bg-white border border-[var(--color-border)] text-[var(--color-ink-700)] hover:border-[var(--color-gold-400)]'
+                }`}
+                style={categoryId === cat.id ? { backgroundColor: cat.color || 'var(--color-gold-500)' } : undefined}
+              >
+                {cat.name}
+              </button>
+            ))}
+            {isAdmin && (
+              <button
+                onClick={() => setIsCategoryManagerOpen(true)}
+                className="sm:hidden flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide border border-dashed border-[var(--color-gold-400)] text-[var(--color-gold-600)]"
+              >
+                + Categorias
+              </button>
+            )}
+          </div>
+        )}
+      </header>
+
+      {/* Conteúdo */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-8">
+        {isFormOpen && isAdmin && (
+          <ProductForm
+            initialData={editingProduct}
+            onSubmit={handleSubmit}
+            onCancel={() => { setIsFormOpen(false); setEditingProduct(null); }}
+            onManageCategories={() => setIsCategoryManagerOpen(true)}
+            isLoading={loading}
+          />
+        )}
+
+        {categories.length === 0 && isAdmin && !isFormOpen && (
+          <div className="text-center py-16 px-6 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-gold-400)] bg-[var(--color-gold-100)]/40">
+            <p className="font-display text-xl text-[var(--color-ink-900)] mb-2">Comece criando suas categorias</p>
+            <p className="text-sm text-[var(--color-ink-500)] mb-5">
+              Elas organizam como os itens aparecem,você define os nomes.
+            </p>
+            <button
+              onClick={() => setIsCategoryManagerOpen(true)}
+              className="px-6 py-3 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] text-[var(--color-cream-50)] text-sm font-semibold hover:bg-[var(--color-ink-700)] transition-colors"
+            >
+              Criar categorias
+            </button>
+          </div>
+        )}
+
+        {loading && products.length === 0 ? (
+          <div className="py-24 text-center">
+            <div className="w-8 h-8 mx-auto border-2 border-[var(--color-gold-500)] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : (
+          <ProductTable
+            products={products}
+            onEdit={handleEdit}
+            onDelete={(id) => setPendingDeleteId(id)}
+            isAdmin={isAdmin}
+          />
+        )}
       </div>
+
+      <CategoryManager isOpen={isCategoryManagerOpen} onClose={() => setIsCategoryManagerOpen(false)} />
+
+      {/* Confirmação de exclusão de produto */}
+      {pendingDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div
+            className="absolute inset-0 bg-[var(--color-ink-900)]/50 backdrop-blur-sm"
+            onClick={() => !isDeletingProduct && setPendingDeleteId(null)}
+          />
+          <div className="relative w-full max-w-sm bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-elevated)] p-6 animate-fade-in-up">
+            <h3 className="font-display text-lg text-[var(--color-ink-900)] mb-2">Excluir este item?</h3>
+            <p className="text-sm text-[var(--color-ink-500)] mb-5">Esta ação não pode ser desfeita.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPendingDeleteId(null)}
+                disabled={isDeletingProduct}
+                className="flex-1 px-4 py-2.5 rounded-[var(--radius-md)] border border-[var(--color-border)] text-sm font-semibold text-[var(--color-ink-700)] hover:bg-[var(--color-cream-100)] transition-colors disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                disabled={isDeletingProduct}
+                className="flex-1 px-4 py-2.5 rounded-[var(--radius-md)] bg-[var(--color-danger)] text-white text-sm font-semibold hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
+              >
+                {isDeletingProduct ? 'Excluindo...' : 'Excluir'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

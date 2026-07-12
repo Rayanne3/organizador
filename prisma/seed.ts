@@ -3,64 +3,58 @@ const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
+// Defina como false se não quiser nenhum dado de exemplo, só o admin
+const SEED_EXAMPLE_DATA = true;
+
 async function main() {
   console.log('Limpando banco de dados...');
   await prisma.priceHistory.deleteMany();
   await prisma.product.deleteMany();
+  await prisma.category.deleteMany();
   await prisma.user.deleteMany();
 
   console.log('Criando usuário administrador...');
   const hashedPassword = await bcrypt.hash('admin123', 10);
-  
+
   await prisma.user.create({
     data: {
-      name: 'Administrador ODS',
-      email: 'admin@ods.com',
+      name: 'Administrador',
+      email: 'admin@sistema.com',
       password: hashedPassword,
       role: 'ADMIN',
     },
   });
 
-  const products = [
-    {
-      name: 'iPhone 15 Pro',
-      sku: 'ELE-001',
-      price: 8500.00,
-      category: 'Eletrônicos',
-      description: 'Smartphone Apple com chip A17 Pro e câmera de 48MP.',
-      imageUrl: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?w=400&h=400&fit=crop',
-    },
-    {
-      name: 'Camiseta Algodão Egípcio',
-      sku: 'VEST-010',
-      price: 129.90,
-      category: 'Vestuário',
-      description: 'Camiseta premium com alta durabilidade e conforto.',
-      imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=400&h=400&fit=crop',
-    },
-    {
-      name: 'Café Especial 500g',
-      sku: 'ALI-55',
-      price: 45.00,
-      category: 'Alimentos',
-      description: 'Café torrado em grãos, notas de chocolate e caramelo.',
-      imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&h=400&fit=crop',
-    }
-  ];
+  if (SEED_EXAMPLE_DATA) {
+    console.log('Criando categoria de exemplo (apenas para teste)...');
 
-  console.log('Populando produtos...');
-  for (const product of products) {
+    const categoriaExemplo = await prisma.category.create({
+      data: {
+        name: 'Categoria Exemplo',
+        slug: 'categoria-exemplo',
+        color: '#8a7a5c',
+        order: 0,
+      },
+    });
+
+    console.log('Criando produto de exemplo (apenas para teste)...');
+
     await prisma.product.create({
       data: {
-        ...product,
-        status: 'ACTIVE'
-      }
+        name: 'Produto Exemplo',
+        sku: 'EX-001',
+        price: 49.9,
+        description: 'Este é um item de demonstração. Você pode editar ou excluir livremente — as categorias e produtos reais são cadastrados por você direto no sistema.',
+        status: 'ACTIVE',
+        categoryId: categoriaExemplo.id,
+        // image fica null propositalmente — o upload é feito pela interface
+      },
     });
   }
 
   console.log('---');
   console.log('Banco de dados populado!');
-  console.log('LOGIN ADMIN: admin@ods.com');
+  console.log('LOGIN ADMIN: admin@sistema.com');
   console.log('SENHA ADMIN: admin123');
 }
 

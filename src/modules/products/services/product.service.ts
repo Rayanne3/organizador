@@ -8,7 +8,7 @@ export const ProductService = {
   async getAll(filters?: ProductFilters): Promise<Product[]> {
     const params = new URLSearchParams();
     if (filters?.search) params.append("search", filters.search);
-    if (filters?.category) params.append("category", filters.category);
+    if (filters?.categoryId) params.append("categoryId", filters.categoryId);
 
     const queryString = params.toString();
     const url = queryString ? `${API_URL}?${queryString}` : API_URL;
@@ -45,9 +45,10 @@ export const ProductService = {
   },
 
   async delete(id: string): Promise<void> {
-    const response = await fetch(`${API_URL}/${id}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) throw new Error("Erro ao excluir produto");
+    const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || "Erro ao excluir produto");
+    }
   },
 };

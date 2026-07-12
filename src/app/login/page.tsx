@@ -37,9 +37,8 @@ export default function LoginPage() {
         throw new Error(result.error || 'Erro ao realizar login');
       }
 
-      // Login bem sucedido, redireciona para a home
       router.push('/');
-      router.refresh(); // Garante que o Next.js revalide o estado de autenticação
+      router.refresh();
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -48,55 +47,65 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white p-8 rounded-xl border border-gray-300 shadow-xl">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-black text-gray-900 tracking-tighter">ACESSO ADMIN</h1>
-          <p className="text-gray-600 font-medium">Organizador ODS</p>
-        </div>
-
-        {error && (
-          <div className="mb-6 p-4 bg-red-100 border-l-4 border-red-600 text-red-800 font-bold text-sm">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-black text-gray-700 uppercase">E-mail</label>
-            <input
-              {...register('email')}
-              type="email"
-              className={`w-full border-2 rounded-lg px-4 py-2.5 text-gray-900 font-medium focus:ring-2 focus:ring-blue-600 outline-none transition-all ${errors.email ? 'border-red-500' : 'border-gray-400'}`}
-              placeholder="admin@ods.com"
-            />
-            {errors.email && <span className="text-xs font-bold text-red-600">{errors.email.message}</span>}
+    <main className="min-h-screen flex items-center justify-center px-4 py-10 bg-[var(--color-cream-50)]">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-[var(--shadow-elevated)] p-8 sm:p-10 animate-fade-in-up">
+          <div className="text-center mb-9">
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-[var(--color-gold-100)] flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold-600)" strokeWidth="1.5">
+                <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <h1 className="font-display text-3xl text-[var(--color-ink-900)]">Acesso administrativo</h1>
+            <p className="text-sm text-[var(--color-ink-500)] mt-1.5">Entre para gerenciar OS PRODUTOS</p>
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-black text-gray-700 uppercase">Senha</label>
-            <input
-              {...register('password')}
-              type="password"
-              className={`w-full border-2 rounded-lg px-4 py-2.5 text-gray-900 font-medium focus:ring-2 focus:ring-blue-600 outline-none transition-all ${errors.password ? 'border-red-500' : 'border-gray-400'}`}
-              placeholder="••••••••"
-            />
-            {errors.password && <span className="text-xs font-bold text-red-600">{errors.password.message}</span>}
+          {error && (
+            <div className="mb-6 px-4 py-3 rounded-[var(--radius-md)] bg-[var(--color-danger-bg)] text-[var(--color-danger)] font-semibold text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-[var(--color-ink-700)] uppercase tracking-wide">E-mail</label>
+              <input
+                {...register('email')}
+                type="email"
+                autoComplete="email"
+                className={`w-full px-4 py-3.5 rounded-[var(--radius-md)] border bg-[var(--color-cream-50)] text-[var(--color-ink-900)] font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-gold-400)] transition-all ${errors.email ? 'border-[var(--color-danger)]' : 'border-[var(--color-border)]'}`}
+                placeholder="seu@email.com"
+              />
+              {errors.email && <span className="text-xs font-semibold text-[var(--color-danger)]">{errors.email.message}</span>}
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-[var(--color-ink-700)] uppercase tracking-wide">Senha</label>
+              <input
+                {...register('password')}
+                type="password"
+                autoComplete="current-password"
+                className={`w-full px-4 py-3.5 rounded-[var(--radius-md)] border bg-[var(--color-cream-50)] text-[var(--color-ink-900)] font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-gold-400)] transition-all ${errors.password ? 'border-[var(--color-danger)]' : 'border-[var(--color-border)]'}`}
+                placeholder="••••••••"
+              />
+              {errors.password && <span className="text-xs font-semibold text-[var(--color-danger)]">{errors.password.message}</span>}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3.5 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] text-[var(--color-cream-50)] font-semibold hover:bg-[var(--color-ink-700)] active:scale-[0.98] transition-all disabled:opacity-50 shadow-[var(--shadow-card)]"
+            >
+              {isLoading ? 'Entrando...' : 'Entrar'}
+            </button>
+          </form>
+
+          <div className="mt-8 pt-6 border-t border-[var(--color-border)] text-center">
+            <Link href="/" className="text-sm font-semibold text-[var(--color-ink-500)] hover:text-[var(--color-gold-600)] transition-colors">
+              ← Voltar
+            </Link>
           </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl shadow-lg transition-all active:scale-95 disabled:opacity-50"
-          >
-            {isLoading ? 'AUTENTICANDO...' : 'ENTRAR NO SISTEMA'}
-          </button>
-        </form>
-
-        <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-          <Link href="/" className="text-sm font-bold text-gray-500 hover:text-blue-700 transition-colors">
-            ← VOLTAR COMO CONVIDADO
-          </Link>
         </div>
       </div>
     </main>
