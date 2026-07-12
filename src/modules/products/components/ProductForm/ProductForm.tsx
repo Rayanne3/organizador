@@ -88,9 +88,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
           <input
             type="number"
             step="0.01"
-            {...register('price')}
+            {...register('price', { valueAsNumber: true })}
             className="border-2 border-gray-400 rounded-lg px-4 py-2.5 text-gray-900 bg-white focus:ring-2 focus:ring-blue-600 outline-none"
-          />
+            />
           {errors.price && <span className="text-xs font-bold text-red-600">{errors.price.message}</span>}
         </div>
 
