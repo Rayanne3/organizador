@@ -66,15 +66,11 @@ export const useProducts = () => {
     }
   };
 
-  // Ajuste rápido de estoque (+1 / -1) com atualização otimista na tela
-  const adjustStock = async (id: string, delta: number) => {
+  // Grava o valor final de estoque (chamado só quando o usuário confirma)
+  const adjustStock = async (id: string, newStock: number) => {
     const current = products.find((p) => p.id === id);
-    if (!current) return;
+    if (!current || newStock === current.stock) return;
 
-    const newStock = Math.max(0, current.stock + delta);
-    if (newStock === current.stock) return;
-
-    // Atualiza a tela imediatamente
     setProducts((prev) =>
       prev.map((p) => (p.id === id ? { ...p, stock: newStock } : p))
     );
@@ -82,7 +78,6 @@ export const useProducts = () => {
     try {
       await ProductService.update(id, { stock: newStock });
     } catch (err: any) {
-      // Se falhar, desfaz a mudança visual e avisa
       setProducts((prev) =>
         prev.map((p) => (p.id === id ? { ...p, stock: current.stock } : p))
       );

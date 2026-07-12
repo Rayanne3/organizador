@@ -84,6 +84,7 @@ export class PrismaProductRepository implements IProductRepository {
         sku: data.sku,
         price: data.price,
         image: data.image,
+        stock: data.stock,
         categoryId: data.categoryId,
         status: data.status,
       },
