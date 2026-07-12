@@ -14,7 +14,6 @@ export const productSchema = z.object({
   name: z.string().min(3, "O nome deve ter no mínimo 3 caracteres"),
   description: z.string().optional().nullable(),
   sku: z.string().min(3, "O SKU deve ter no mínimo 3 caracteres"),
-  // Usando coerce para evitar o erro de 'unknown' no TypeScript
   price: z.coerce.number().min(0.01, "O preço deve ser maior que zero"),
   category: z.enum(PRODUCT_CATEGORIES, {
     errorMap: () => ({ message: "Selecione uma categoria válida" }),
