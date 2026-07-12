@@ -11,7 +11,8 @@ const PROTECTED_PREFIXES = ['/api/products', '/api/categories'];
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get('auth_token')?.value;
-  const { pathname, method } = request.nextUrl;
+  const { pathname } = request.nextUrl;
+  const method = request.method;
 
   const isProtectedResource = PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
   const isWriteMethod = ['POST', 'PATCH', 'DELETE'].includes(method);
