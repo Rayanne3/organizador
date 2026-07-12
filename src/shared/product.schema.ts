@@ -14,7 +14,7 @@ export const productSchema = z.object({
   name: z.string().min(3, "O nome deve ter no mínimo 3 caracteres"),
   description: z.string().optional().nullable(),
   sku: z.string().min(3, "O SKU deve ter no mínimo 3 caracteres"),
-  price: z.coerce.number().min(0.01, "O preço deve ser maior que zero"),
+  price: z.number({ invalid_type_error: "O preço deve ser um número" }).min(0.01, "O preço deve ser maior que zero"),
   category: z.enum(PRODUCT_CATEGORIES, {
     errorMap: () => ({ message: "Selecione uma categoria válida" }),
   }),
