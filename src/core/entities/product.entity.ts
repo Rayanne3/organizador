@@ -11,7 +11,8 @@ export interface Product {
   description: string | null;
   sku: string;
   price: number;
-  image: string | null; // base64 data URL (ex: "data:image/jpeg;base64,...")
+  image: string | null;
+  stock: number;
   status: "ACTIVE" | "INACTIVE";
   categoryId: string;
   category: ProductCategoryRef;
@@ -26,6 +27,7 @@ export interface CreateProductDTO {
   price: number;
   categoryId: string;
   image?: string | null;
+  stock?: number;
 }
 
 export interface UpdateProductDTO extends Partial<CreateProductDTO> {

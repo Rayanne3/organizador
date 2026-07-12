@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// ~5MB de imagem original vira ~6.7MB em base64 — limite generoso pra tablet/celular
 const MAX_IMAGE_BASE64_LENGTH = 7_000_000;
 
 export const productSchema = z.object({
@@ -9,6 +8,7 @@ export const productSchema = z.object({
   sku: z.string().min(3, "SKU muito curto"),
   price: z.number().min(0.01, "Preço deve ser maior que zero"),
   categoryId: z.string().min(1, "Selecione uma categoria"),
+  stock: z.number().int("Quantidade deve ser um número inteiro").min(0, "Quantidade não pode ser negativa"),
   image: z
     .string()
     .refine((val) => !val || val.startsWith("data:image/"), "Imagem inválida")

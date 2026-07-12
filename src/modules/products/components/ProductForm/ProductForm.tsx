@@ -122,14 +122,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-[var(--color-ink-700)]">Preço (R$)</label>
+            <label className="text-sm font-semibold text-[var(--color-ink-700)]">Estoque inicial</label>
             <input
               type="number"
-              step="0.01"
-              {...register('price', { valueAsNumber: true })}
-              className={`px-4 py-3 rounded-[var(--radius-md)] border bg-[var(--color-cream-50)] text-sm font-medium text-[var(--color-ink-900)] focus:outline-none focus:ring-2 focus:ring-[var(--color-gold-400)] transition-all ${errors.price ? 'border-[var(--color-danger)]' : 'border-[var(--color-border)]'}`}
+              step="1"
+              {...register('stock', { valueAsNumber: true })}
+              className={`px-4 py-3 rounded-[var(--radius-md)] border bg-[var(--color-cream-50)] text-sm font-medium text-[var(--color-ink-900)] focus:outline-none focus:ring-2 focus:ring-[var(--color-gold-400)] transition-all ${errors.stock ? 'border-[var(--color-danger)]' : 'border-[var(--color-border)]'}`}
+              placeholder="0"
             />
-            {errors.price && <span className="text-xs font-semibold text-[var(--color-danger)]">{errors.price.message}</span>}
+            {errors.stock && <span className="text-xs font-semibold text-[var(--color-danger)]">{errors.stock.message}</span>}
           </div>
 
           <div className="flex flex-col gap-1.5">

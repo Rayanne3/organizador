@@ -48,7 +48,8 @@ model Product {
   description  String?
   sku          String         @unique
   price        Decimal        @db.Decimal(10, 2)
-  image        String?        @db.Text // imagem em base64 (data URL), enviada do dispositivo
+  image        String?        @db.Text
+  stock        Int            @default(0)
   status       Status         @default(ACTIVE)
   categoryId   String
   category     Category       @relation(fields: [categoryId], references: [id])

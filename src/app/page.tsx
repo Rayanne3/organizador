@@ -24,6 +24,7 @@ export default function MenuPage() {
     addProduct,
     editProduct,
     removeProduct,
+    adjustStock,
   } = useProducts();
 
   const { categories } = useCategories();
@@ -228,6 +229,7 @@ export default function MenuPage() {
             products={products}
             onEdit={handleEdit}
             onDelete={(id) => setPendingDeleteId(id)}
+            onAdjustStock={adjustStock}
             isAdmin={isAdmin}
           />
         )}

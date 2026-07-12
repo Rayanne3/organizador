@@ -66,6 +66,30 @@ export const useProducts = () => {
     }
   };
 
+  // Ajuste rápido de estoque (+1 / -1) com atualização otimista na tela
+  const adjustStock = async (id: string, delta: number) => {
+    const current = products.find((p) => p.id === id);
+    if (!current) return;
+
+    const newStock = Math.max(0, current.stock + delta);
+    if (newStock === current.stock) return;
+
+    // Atualiza a tela imediatamente
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, stock: newStock } : p))
+    );
+
+    try {
+      await ProductService.update(id, { stock: newStock });
+    } catch (err: any) {
+      // Se falhar, desfaz a mudança visual e avisa
+      setProducts((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, stock: current.stock } : p))
+      );
+      alert(err.message || 'Erro ao atualizar estoque');
+    }
+  };
+
   return {
     products,
     loading,
@@ -77,6 +101,7 @@ export const useProducts = () => {
     addProduct,
     editProduct,
     removeProduct,
+    adjustStock,
     refresh: fetchProducts,
   };
 };

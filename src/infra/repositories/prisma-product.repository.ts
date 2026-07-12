@@ -11,6 +11,7 @@ export class PrismaProductRepository implements IProductRepository {
       sku: p.sku,
       price: Number(p.price),
       image: p.image ?? null,
+      stock: p.stock,
       status: p.status as "ACTIVE" | "INACTIVE",
       categoryId: p.categoryId,
       category: {
@@ -32,6 +33,7 @@ export class PrismaProductRepository implements IProductRepository {
         sku: data.sku,
         price: data.price,
         image: data.image,
+        stock: data.stock ?? 0,
         categoryId: data.categoryId,
         status: 'ACTIVE',
       },
