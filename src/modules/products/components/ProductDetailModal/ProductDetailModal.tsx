@@ -106,6 +106,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
                   {product.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}
                 </p>
               </div>
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--color-ink-300)]">Preço de Custo</span>
+                <p className="text-sm font-semibold text-[var(--color-gold-600)] mt-0.5">
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.costPrice)}
+                </p>
+              </div>
             </div>
 
             {isAdmin && onEdit && (

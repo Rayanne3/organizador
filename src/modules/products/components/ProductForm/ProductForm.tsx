@@ -18,37 +18,41 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const { categories } = useCategories();
 
   const {
-    register,
-    handleSubmit,
-    control,
-    reset,
-    formState: { errors },
-  } = useForm<ProductInput>({
-    resolver: zodResolver(productSchema),
-    defaultValues: {
-      name: '',
-      description: '',
-      sku: '',
-      price: 0,
-      categoryId: '',
-      image: null,
-    },
-  });
+  register,
+  handleSubmit,
+  control,
+  reset,
+  formState: { errors },
+} = useForm<ProductInput>({
+  resolver: zodResolver(productSchema),
+  defaultValues: {
+    name: '',
+    description: '',
+    sku: '',
+    price: 0,
+    costPrice: 0, // Adicionado
+    categoryId: '',
+    image: null,
+    stock: 0,
+  },
+});
 
-  useEffect(() => {
-    if (initialData) {
-      reset({
-        name: initialData.name,
-        description: initialData.description || '',
-        sku: initialData.sku,
-        price: Number(initialData.price),
-        categoryId: initialData.categoryId,
-        image: initialData.image,
-      });
-    } else {
-      reset({ name: '', description: '', sku: '', price: 0, categoryId: '', image: null });
-    }
-  }, [initialData, reset]);
+useEffect(() => {
+  if (initialData) {
+    reset({
+      name: initialData.name,
+      description: initialData.description || '',
+      sku: initialData.sku,
+      price: Number(initialData.price),
+      costPrice: Number(initialData.costPrice || 0), // IMPORTANTE: Carrega o preço de custo
+      categoryId: initialData.categoryId,
+      image: initialData.image,
+      stock: initialData.stock,
+    });
+  } else {
+    reset({ name: '', description: '', sku: '', price: 0, costPrice: 0, categoryId: '', image: null, stock: 0 });
+  }
+}, [initialData, reset]);
 
   return (
     <form
