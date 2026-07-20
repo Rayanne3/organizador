@@ -79,30 +79,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         </div>
 
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-[var(--color-ink-700)]">Preço de Custo (R$)</label>
-            <input
-              type="number"
-              step="0.01"
-              {...register('costPrice', { valueAsNumber: true })}
-              className={`px-4 py-3 rounded-[var(--radius-md)] border bg-[var(--color-cream-50)] text-sm font-medium text-[var(--color-ink-900)] focus:outline-none focus:ring-2 focus:ring-[var(--color-gold-400)] transition-all ${errors.costPrice ? 'border-[var(--color-danger)]' : 'border-[var(--color-border)]'}`}
-              placeholder="0,00"
-            />
-            {errors.costPrice && <span className="text-xs font-semibold text-[var(--color-danger)]">{errors.costPrice.message}</span>}
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-[var(--color-ink-700)]">Preço de Venda (R$)</label>
-            <input
-              type="number"
-              step="0.01"
-              {...register('price', { valueAsNumber: true })}
-              className={`px-4 py-3 rounded-[var(--radius-md)] border bg-[var(--color-cream-50)] text-sm font-medium text-[var(--color-ink-900)] focus:outline-none focus:ring-2 focus:ring-[var(--color-gold-400)] transition-all ${errors.price ? 'border-[var(--color-danger)]' : 'border-[var(--color-border)]'}`}
-              placeholder="0,00"
-            />
-            {errors.price && <span className="text-xs font-semibold text-[var(--color-danger)]">{errors.price.message}</span>}
-          </div>
-
         {/* Coluna dos campos */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="flex flex-col gap-1.5 sm:col-span-2">
@@ -166,6 +142,29 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               placeholder="Ex: PRT-014"
             />
             {errors.sku && <span className="text-xs font-semibold text-[var(--color-danger)]">{errors.sku.message}</span>}
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-[var(--color-ink-700)]">Preço de Custo (R$)</label>
+            <input
+              type="number"
+              step="0.01"
+              {...register('costPrice', { valueAsNumber: true })}
+              className={`px-4 py-3 rounded-[var(--radius-md)] border bg-[var(--color-cream-50)] text-sm font-medium text-[var(--color-ink-900)] focus:outline-none focus:ring-2 focus:ring-[var(--color-gold-400)] transition-all ${errors.costPrice ? 'border-[var(--color-danger)]' : 'border-[var(--color-border)]'}`}
+              placeholder="0,00"
+            />
+            {errors.costPrice && <span className="text-xs font-semibold text-[var(--color-danger)]">{errors.costPrice.message}</span>}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-[var(--color-ink-700)]">Preço de Venda (R$)</label>
+            <input
+              type="number"
+              step="0.01"
+              {...register('price', { valueAsNumber: true })}
+              className={`px-4 py-3 rounded-[var(--radius-md)] border bg-[var(--color-cream-50)] text-sm font-medium text-[var(--color-ink-900)] focus:outline-none focus:ring-2 focus:ring-[var(--color-gold-400)] transition-all ${errors.price ? 'border-[var(--color-danger)]' : 'border-[var(--color-border)]'}`}
+              placeholder="0,00"
+            />
+            {errors.price && <span className="text-xs font-semibold text-[var(--color-danger)]">{errors.price.message}</span>}
           </div>
 
           <div className="flex flex-col gap-1.5 sm:col-span-2">
