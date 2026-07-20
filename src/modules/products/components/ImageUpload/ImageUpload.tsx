@@ -1,10 +1,12 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useCallback, useRef, useState } from 'react';
 import { ImageUploadProps } from './ImageUpload.types';
 
-const MAX_DIMENSION = 1600;
-const JPEG_QUALITY = 0.82;
+const MAX_DIMENSION = 1200; // Reduzido de 1600
+const JPEG_QUALITY = 0.6;    // Reduzido de 0.82 (0.6 ainda tem ótima qualidade no celular)
 
 // Redimensiona e comprime a imagem no navegador antes de virar base64
 async function compressImage(file: File): Promise<string> {

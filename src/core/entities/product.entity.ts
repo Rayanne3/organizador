@@ -10,7 +10,8 @@ export interface Product {
   name: string;
   description: string | null;
   sku: string;
-  price: number;
+  price: number;      // Preço de Venda
+  costPrice: number;  // ADICIONADO: Preço de Custo
   image: string | null;
   stock: number;
   status: "ACTIVE" | "INACTIVE";
@@ -25,6 +26,7 @@ export interface CreateProductDTO {
   description?: string | null;
   sku: string;
   price: number;
+  costPrice: number; // ADICIONADO
   categoryId: string;
   image?: string | null;
   stock?: number;
